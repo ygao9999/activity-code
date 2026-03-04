@@ -47,12 +47,19 @@ public class MainActivity extends Activity {
             action = "android.provider.Telephony.SECRET_CODE";
         }
 
-        Intent intent = new Intent(action, android.net.Uri.parse("android_secret_code://" + code));
-        // 发送广播，唤起其他应用或本应用注册的监听器
-        sendBroadcast(intent);
+        String cmd = "am broadcast -a " + action + " -d android_secret_code://" + code;
         
-        Log.d(TAG, "Sent Secret Code Broadcast: " + code);
-        Toast.makeText(this, "Triggered Secret Code: " + code, Toast.LENGTH_SHORT).show();
+        try {
+            // 使用 su 命令通过 root 权限发送广播，绕过普通应用无法发送受保护广播的限制
+            Process p = Runtime.getRuntime().exec(new String[]{"su", "-c", cmd});
+            Log.d(TAG, "Sent Secret Code Broadcast via Root: " + cmd);
+            Toast.makeText(this, "Triggering via Root...", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to execute root command, trying standard broadcast", e);
+            // 兜底方案（很可能依然报权限错误）
+            Intent intent = new Intent(action, android.net.Uri.parse("android_secret_code://" + code));
+            sendBroadcast(intent);
+        }
     }
 
     private void registerSecretCodeReceiver() {
