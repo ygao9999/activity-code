@@ -56,7 +56,7 @@ public class MainHook implements IXposedHookLoadPackage {
                     XposedBridge.log(TAG + ": 检测到 Activity 启动: " + activityName);
 
                     // 检查类名是否包含目标字符串
-                    if (activityName.contains("com.miui.securityscan.MainActivity") || activityName.contains("com.miui.securitymanager.MainActivity") ||
+                    if (activityName.contains("com.miui.securityscan.MainActivity") || activityName.contains("com.miui.securitymain.SCMainEntryActivity") ||
                         activityName.contains("securitycenter")) {
                         
                         Log.w(TAG, "!! 命中拦截规则 !! -> " + activityName);
