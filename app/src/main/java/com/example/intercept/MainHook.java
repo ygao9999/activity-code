@@ -42,13 +42,13 @@ public class MainHook implements IXposedHookLoadPackage {
             Bundle.class, 
             new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     Activity activity = (Activity) param.thisObject;
                     String activityName = activity.getClass().getName();
                     
                     if (shouldIntercept(activityName, lpparam.packageName)) {
-                        Log.w(TAG, "!! 拦截触发 (onCreate 之后) !! -> " + activityName);
-                        XposedBridge.log(TAG + ": !! 拦截触发 (onCreate 之后) !! -> " + activityName);
+                        Log.w(TAG, "!! 拦截触发 (onCreate 之前) !! -> " + activityName);
+                        XposedBridge.log(TAG + ": !! 拦截触发 (onCreate 之前) !! -> " + activityName);
                         activity.finish();
                         activity.finishAndRemoveTask();
                     }
@@ -56,26 +56,7 @@ public class MainHook implements IXposedHookLoadPackage {
             }
         );
 
-        // Hook onResume - 界面即将显示时的最后防线
-        XposedHelpers.findAndHookMethod(
-            "android.app.Activity", 
-            lpparam.classLoader, 
-            "onResume", 
-            new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    Activity activity = (Activity) param.thisObject;
-                    String activityName = activity.getClass().getName();
-                    
-                    if (shouldIntercept(activityName, lpparam.packageName)) {
-                        Log.w(TAG, "!! 拦截触发 (onResume 之前) !! -> " + activityName);
-                        XposedBridge.log(TAG + ": !! 拦截触发 (onResume 之前) !! -> " + activityName);
-                        activity.finish();
-                        activity.finishAndRemoveTask();
-                    }
-                }
-            }
-        );
+
     }
 
     private boolean shouldIntercept(String activityName, String packageName) {
