@@ -54,6 +54,7 @@ public class MainHook implements IXposedHookLoadPackage {
                     
                     if (shouldIntercept(activityName, lpparam.packageName)) {
                         Log.w(TAG, "!! 拦截触发 (onCreate 之后) !! -> " + activityName);
+                        XposedBridge.log(TAG + ": !! 拦截触发 (onCreate 之后) !! -> " + activityName);
                         activity.finish();
                         activity.finishAndRemoveTask();
                     }
@@ -74,6 +75,7 @@ public class MainHook implements IXposedHookLoadPackage {
                     
                     if (shouldIntercept(activityName, lpparam.packageName)) {
                         Log.w(TAG, "!! 拦截触发 (onResume 之前) !! -> " + activityName);
+                        XposedBridge.log(TAG + ": !! 拦截触发 (onResume 之前) !! -> " + activityName);
                         activity.finish();
                         activity.finishAndRemoveTask();
                     }
