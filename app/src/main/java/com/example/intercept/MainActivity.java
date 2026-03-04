@@ -63,7 +63,7 @@ public class MainActivity extends Activity {
             // noinspection InlinedApi
             intentFilter.addAction(Telephony.Sms.Intents.SECRET_CODE_ACTION);
         }
-        intentFilter.addDataAuthority("*#*#6776799#*#*", null);
+        intentFilter.addDataAuthority("6776799", null);
         intentFilter.addDataScheme("android_secret_code");
 
         // The user's snippet used a very specific registerReceiver call.
