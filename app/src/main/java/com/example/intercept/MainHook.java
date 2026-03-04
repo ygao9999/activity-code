@@ -48,35 +48,44 @@ public class MainHook implements IXposedHookLoadPackage {
             Bundle.class, 
             new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Activity activity = (Activity) param.thisObject;
                     String activityName = activity.getClass().getName();
                     
-                    Log.d(TAG, "检测到 Activity 启动: " + activityName);
-                    XposedBridge.log(TAG + ": 检测到 Activity 启动: " + activityName);
-
-                    // 检查类名是否包含目标字符串
-                    if (activityName.contains("com.miui.securityscan.MainActivity") || 
-                        activityName.contains("com.miui.securitymain.SCMainEntryActivity") ||
-                        activityName.contains("securitycenter")) {
-                        
-                        Log.w(TAG, "!! 命中拦截规则 !! -> " + activityName);
-                        XposedBridge.log(TAG + ": !! 命中拦截规则 !! -> " + activityName);
-                        
-                        // 1. 强行关闭 Activity
+                    if (shouldIntercept(activityName, lpparam.packageName)) {
+                        Log.w(TAG, "!! 拦截触发 (onCreate 之后) !! -> " + activityName);
                         activity.finish();
-                        // 2. 移除任务栈（API 21+），防止它留在后台或最近任务里
                         activity.finishAndRemoveTask();
-                        
-                        // 3. 关键：阻止原 Activity 的 onCreate 继续执行
-                        // 设置结果为 null 会让原方法不再运行，从而彻底拦截初始化
-                        param.setResult(null);
                     }
                 }
             }
         );
 
+        // Hook onResume - 界面即将显示时的最后防线
+        XposedHelpers.findAndHookMethod(
+            "android.app.Activity", 
+            lpparam.classLoader, 
+            "onResume", 
+            new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    Activity activity = (Activity) param.thisObject;
+                    String activityName = activity.getClass().getName();
+                    
+                    if (shouldIntercept(activityName, lpparam.packageName)) {
+                        Log.w(TAG, "!! 拦截触发 (onResume 之前) !! -> " + activityName);
+                        activity.finish();
+                        activity.finishAndRemoveTask();
+                    }
+                }
+            }
+        );
+    }
 
+    private boolean shouldIntercept(String activityName, String packageName) {
+        return activityName.contains("com.miui.securityscan.MainActivity") || 
+               activityName.contains("com.miui.securitymain.SCMainEntryActivity") ||
+               activityName.contains("securitycenter");
     }
 
 }
