@@ -45,7 +45,8 @@ public class MainHook implements IXposedHookLoadPackage {
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     Activity activity = (Activity) param.thisObject;
                     String activityName = activity.getClass().getName();
-                    
+                    Log.d(TAG, "检测到 Activity 启动: " + activityName);
+                    XposedBridge.log(TAG + ": 检测到 Activity 启动: " + activityName);                    
                     if (shouldIntercept(activityName, lpparam.packageName)) {
                         Log.w(TAG, "!! 拦截触发 (onCreate 之前) !! -> " + activityName);
                         XposedBridge.log(TAG + ": !! 拦截触发 (onCreate 之前) !! -> " + activityName);
