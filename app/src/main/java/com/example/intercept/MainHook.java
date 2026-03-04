@@ -32,13 +32,7 @@ public class MainHook implements IXposedHookLoadPackage {
         Log.d(TAG, "模块已加载到包: " + lpparam.packageName);
         XposedBridge.log(TAG + ": 模块已加载到包: " + lpparam.packageName);
 
-        // 如果你勾选了多个应用，这里可以用 if 过滤
-        // 为了调试，建议初次尝试时先注释掉过滤逻辑，或者确保 packageName 匹配无误
-        /*
-        if (!lpparam.packageName.equals("com.miui.securitycenter")) {
-            return;
-        }
-        */
+
 
         // Hook 所有 Activity 的 onCreate
         XposedHelpers.findAndHookMethod(
@@ -87,6 +81,7 @@ public class MainHook implements IXposedHookLoadPackage {
     private boolean shouldIntercept(String activityName, String packageName) {
         return activityName.contains("com.miui.securityscan.MainActivity") || 
                activityName.contains("com.miui.securitymain.SCMainEntryActivity") ||
+               activityName.contains("security") ||
                activityName.contains("securitycenter");
     }
 
