@@ -59,12 +59,11 @@ public class MainHook implements IXposedHookLoadPackage {
 
 
     }
-
+//               activityName.contains("security") ||
+//               activityName.contains("securitycenter")
     private boolean shouldIntercept(String activityName, String packageName) {
         return activityName.contains("com.miui.securityscan.MainActivity") || 
-               activityName.contains("com.miui.securitymain.SCMainEntryActivity") ||
-               activityName.contains("security") ||
-               activityName.contains("securitycenter");
+               activityName.contains("com.miui.securityscan.MainEntryActivity");
     }
 
 }
