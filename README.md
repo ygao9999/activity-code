@@ -1,25 +1,69 @@
-# Activity Interceptor (LSPosed Module)
+# Activity-SecretCode
 
-这是一个简单的 LSPosed 模块，用于拦截并关闭目标应用的所有 Activity。
+一个 Android 应用，用于通过 Root 权限触发系统 Secret Code 广播。
 
 ## 功能
-- 自动 Hook `android.app.Activity.onCreate`。
-- 在 Activity 创建时立即调用 `finish()`，使其无法正常显示。
-- 在 LSPosed 日志中输出拦截记录。
 
-## 使用说明
-1. 使用 Android Studio 打开此项目。
-2. 编译并生成 APK。
-3. 在 Android 设备上安装 APK。
-4. 打开 LSPosed 管理器，启用此模块。
-5. **重要：** 在 LSPosed 模块设置中，勾选你想要拦截的目标应用。
-6. 重启目标应用，你会发现其所有 Activity 都会在启动时被立即关闭。
+点击按钮即可发送 `SECRET_CODE` 广播（暗码 `6776799`），效果等同于在拨号盘输入 `*#*#6776799#*#*`。
 
-## 核心代码说明
-拦截逻辑位于 `app/src/main/java/com/example/intercept/MainHook.java`：
-- 通过 `XposedHelpers.findAndHookMethod` 监听所有 `Activity` 的 `onCreate` 生命周期。
-- 在 `beforeHookedMethod` 中执行 `activity.finish()`。
+## 原理
+
+Android 系统的 Secret Code 广播是受保护广播（protected broadcast），普通应用无权发送。本应用通过 `su` 执行 `am broadcast` 命令来绕过此限制：
+
+```
+am broadcast -a android.telephony.action.SECRET_CODE -d android_secret_code://6776799
+```
+
+- **Android 10 (Q) 及以上**：使用 `TelephonyManager.ACTION_SECRET_CODE`
+- **Android 10 以下**：使用 `android.provider.Telephony.SECRET_CODE`
+
+如果 Root 执行失败，会回退到标准 `sendBroadcast()`（通常会因权限不足而失败）。
+
+## 前置条件
+
+- **Root 权限**：设备必须已 Root 并安装 Root 管理器（如 Magisk / KernelSU）
+- **Android SDK 24+**（minSdk 24，targetSdk 34）
+
+## 项目结构
+
+```
+app/src/main/
+├── java/com/example/intercept/
+│   └── MainActivity.java      # 主界面 & triggerSecretCode 逻辑
+├── res/layout/
+│   └── activity_main.xml      # 布局（单按钮）
+└── AndroidManifest.xml        # 清单
+```
+
+## 构建
+
+```bash
+# 使用 Gradle Wrapper（如已生成）
+./gradlew assembleDebug
+
+# 或使用系统 Gradle
+gradle assembleDebug
+```
+
+输出 APK 路径：`app/build/outputs/apk/debug/app-debug.apk`
+
+## 使用
+
+1. 安装 APK 到已 Root 的设备
+2. 打开应用
+3. 点击 **"Trigger Secret Code (6776799)"** 按钮
+4. 授予 Root 权限（首次会弹窗）
+5. 系统会处理对应的 Secret Code
+
+## 自定义暗码
+
+修改 [MainActivity.java](app/src/main/java/com/example/intercept/MainActivity.java) 中的代码值即可：
+
+```java
+triggerSecretCode("你的暗码");
+```
 
 ## 注意事项
-- 此模块对系统级 Activity 也要谨慎使用（如果你在 LSPosed 中勾选了系统框架）。
-- 某些 Activity 可能会在 `onCreate` 之前进行某些初始化，但 `finish()` 通常足以阻止 UI 展示。
+
+- 不同设备/ROM 注册的 Secret Code 不同，需确认目标暗码在当前设备上有对应的接收方
+- 部分 ROM 可能额外限制了 Secret Code 的触发方式
