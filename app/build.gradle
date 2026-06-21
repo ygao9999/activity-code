@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.intercept'
+    namespace 'com.ygao.secretcode'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.intercept"
+        applicationId "com.ygao.secretcode"
         minSdk 24
         targetSdk 34
         versionCode 1
