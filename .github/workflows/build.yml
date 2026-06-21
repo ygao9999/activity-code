@@ -36,5 +36,5 @@ jobs:
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug
+        name: Activity-SecretCode-debug-apk
         path: app/build/outputs/apk/debug/*.apk
