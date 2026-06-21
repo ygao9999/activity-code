@@ -3,20 +3,9 @@
 
     <application
         android:allowBackup="true"
-        android:label="Activity Interceptor"
+        android:label="SecretCode 触发器"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
-
-        <!-- LSPosed Metadata -->
-        <meta-data
-            android:name="xposedmodule"
-            android:value="true" />
-        <meta-data
-            android:name="xposeddescription"
-            android:value="拦截指定应用的所有Activity" />
-        <meta-data
-            android:name="xposedminversion"
-            android:value="53" />
 
         <activity
             android:name=".MainActivity"
